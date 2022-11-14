@@ -1,3 +1,13 @@
+export const MenuItems = [
+  { key: 'Home', title: 'Home' },
+  { key: 'About', title: 'About' },
+  { key: 'Syllabus', title: 'Syllabus' },
+  { key: 'WebCreation', title: 'Web Creation' },
+  { key: 'Projects', title: 'Projects' },
+  { key: 'Judges', title: 'Judges' },
+  { key: 'Sponsors', title: 'Sponsors' },
+];
+
 type NavigationRouteType = {
   title: string;
   key: string;
