@@ -1,13 +1,19 @@
-import { Col, Descriptions, ImageProps, Row, Image, Typography, List, Card } from 'antd';
+import { DoubleLeftOutlined } from '@ant-design/icons';
+import { Col, Descriptions, ImageProps, Row, Image, Typography, List, Card, Grid, Button } from 'antd';
 import { FC } from 'react';
 import ReactPlayer from 'react-player';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { NavigationRoutes } from '../constants';
 import { CreateWebsiteFormData } from './create-website';
+const { useBreakpoint } = Grid;
 
 export const PreviewWebsite: FC<any> = (props) => {
   // credit: https://stackoverflow.com/questions/42173786/react-router-pass-data-when-navigating-programmatically
   const { state } = useLocation();
   const data = state?.data as CreateWebsiteFormData; // Read values passed on state
+  const screens = useBreakpoint();
+  const navigate = useNavigate();
+
   return (
     <>
       <Row>
@@ -16,10 +22,7 @@ export const PreviewWebsite: FC<any> = (props) => {
             <Descriptions.Item label="Year" labelStyle={{ width: '130px', fontWeight: 'bold' }}>
               2022
             </Descriptions.Item>
-            <Descriptions.Item
-              label="Project Name"
-              labelStyle={{ width: '130px', fontWeight: 'bold' }}
-            >
+            <Descriptions.Item label="Project Name" labelStyle={{ width: '130px', fontWeight: 'bold' }}>
               {data?.name}
             </Descriptions.Item>
             <Descriptions.Item label="Category" labelStyle={{ width: '130px', fontWeight: 'bold' }}>
@@ -28,6 +31,7 @@ export const PreviewWebsite: FC<any> = (props) => {
           </Descriptions>
         </Col>
         <Col flex="210px">
+          <Typography.Paragraph strong>Project's Logo:</Typography.Paragraph>
           <Image
             // height={200}
             src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
@@ -57,8 +61,13 @@ export const PreviewWebsite: FC<any> = (props) => {
 
       <Typography.Title level={5}>Project Video:</Typography.Title>
       <Row justify="center">
-        <Col>
-          <ReactPlayer url={data?.videoUrl} controls />
+        <Col style={{ width: '100%' }}>
+          <ReactPlayer
+            width={screens.xs || !screens.xl ? '100%' : '640px'}
+            height={screens.xs || !screens.xl ? '100%' : '320px'}
+            url={data?.videoUrl}
+            controls
+          />
         </Col>
       </Row>
 
@@ -103,6 +112,19 @@ export const PreviewWebsite: FC<any> = (props) => {
           </List.Item>
         )}
       />
+
+      {/* back button */}
+      <Row justify="center">
+        <Col>
+          <Button
+            onClick={() => {
+              navigate(NavigationRoutes.WebCreation.path);
+            }}
+          >
+            <DoubleLeftOutlined /> Back
+          </Button>
+        </Col>
+      </Row>
     </>
   );
 };

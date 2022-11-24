@@ -1,28 +1,14 @@
-import {
-  Button,
-  Checkbox,
-  Col,
-  Divider,
-  Empty,
-  Form,
-  Input,
-  List,
-  Row,
-  Select,
-  Space,
-  Tooltip,
-  Typography,
-  Upload,
-  UploadFile,
-} from 'antd';
+import { Button, Checkbox, Col, Divider, Empty, Form, Input, List, Row, Select, Space, Tooltip, Typography, Upload, UploadFile, Grid } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { UploadOutlined, PlusOutlined, PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import { CreateWebsiteFormFieldNames, MAX_SCREEN_SHOT_COUNT, NavigationRoutes, ProjectCategories } from '../constants';
 import { useNavigate } from 'react-router-dom';
-import { SelectSearch } from '../components/select-search';
+import { SearchBar } from '../components/create-website/search-bar';
+import { AccountInfo, SearchAddAccount } from '../components/create-website/search-add';
 const { TextArea } = Input;
 const { Option } = Select;
+const { useBreakpoint } = Grid;
 
 interface CreateWebsiteProps {}
 
@@ -33,21 +19,6 @@ export interface ImageProps {
   uid: string;
 }
 
-export interface MemberInfo {
-  id: string;
-  name: string;
-  username: string;
-}
-export interface StakeholderInfo {
-  id: string;
-  name: string;
-  username: string;
-}
-export interface AdvisorInfo {
-  id: string;
-  name: string;
-  username: string;
-}
 export interface CreateWebsiteFormData {
   name?: string;
   category?: string;
@@ -57,12 +28,12 @@ export interface CreateWebsiteFormData {
   hasVideo?: boolean;
   videoUrl?: string;
   screenshots?: ImageProps[];
-  selectedMembers?: MemberInfo[];
-  selectedStakeholders?: StakeholderInfo[];
-  selectedAdvisors?: AdvisorInfo[];
+  selectedMembers?: AccountInfo[];
+  selectedStakeholders?: AccountInfo[];
+  selectedAdvisors?: AccountInfo[];
 }
 
-const DummyAllStudentsData: MemberInfo[] = [
+const DummyAllStudentsData: AccountInfo[] = [
   {
     id: '1',
     name: 'John Brown',
@@ -230,27 +201,28 @@ const DummyFormData: CreateWebsiteFormData = {
 };
 
 export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
+  const screens = useBreakpoint();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const hasVideo = Form.useWatch('hasVideo', form);
   const [screenShots, setScreenShots] = useState<UploadFile[]>(DummyFormData.screenshots ?? []);
   // exclude items that are already selected
-  const [filteredOptionsForMembers, setFilteredOptionsForMembers] = useState<MemberInfo[]>(
+  const [filteredOptionsForMembers, setFilteredOptionsForMembers] = useState<AccountInfo[]>(
     DummyAllStudentsData.filter((item) => {
       return !DummyFormData.selectedMembers?.find((member) => member.id === item.id);
     })
   );
-  const [selectedMembers, setSelectedMembers] = useState<MemberInfo[]>(DummyFormData.selectedMembers ?? []);
+  const [selectedMembers, setSelectedMembers] = useState<AccountInfo[]>(DummyFormData.selectedMembers ?? []);
 
-  const [selectedStakeholders, setSelectedStakeholders] = useState<StakeholderInfo[]>(DummyFormData.selectedStakeholders ?? []);
-  const [filteredOptionsForStakeholders, setFilteredOptionsForStakeholders] = useState<StakeholderInfo[]>(
+  const [selectedStakeholders, setSelectedStakeholders] = useState<AccountInfo[]>(DummyFormData.selectedStakeholders ?? []);
+  const [filteredOptionsForStakeholders, setFilteredOptionsForStakeholders] = useState<AccountInfo[]>(
     DummyAllStakeholdersData.filter((item) => {
       return !DummyFormData.selectedStakeholders?.find((stakeholder) => stakeholder.id === item.id);
     })
   );
 
-  const [selectedAdvisors, setSelectedAdvisors] = useState<AdvisorInfo[]>(DummyFormData.selectedAdvisors ?? []);
-  const [filteredOptionsForAdvisors, setFilteredOptionsForAdvisors] = useState<AdvisorInfo[]>(
+  const [selectedAdvisors, setSelectedAdvisors] = useState<AccountInfo[]>(DummyFormData.selectedAdvisors ?? []);
+  const [filteredOptionsForAdvisors, setFilteredOptionsForAdvisors] = useState<AccountInfo[]>(
     DummyAllAdvisorsData.filter((item) => {
       return !DummyFormData.selectedAdvisors?.find((advisor) => advisor.id === item.id);
     })
@@ -272,7 +244,7 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
   };
 
   // members handlers
-  const onAddMember = (member: MemberInfo) => {
+  const onAddMember = (member: AccountInfo) => {
     form.setFieldValue(CreateWebsiteFormFieldNames.SelectedMembers, selectedMembers.concat(member));
     setSelectedMembers([...selectedMembers, member]);
     // remove from filtered options
@@ -290,7 +262,7 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
       setFilteredOptionsForMembers(searchOptions);
     }
   };
-  const removeMember = (member: MemberInfo) => {
+  const onRemoveMember = (member: AccountInfo) => {
     form.setFieldValue(
       CreateWebsiteFormFieldNames.SelectedMembers,
       selectedMembers.filter((m) => m.id !== member.id)
@@ -305,7 +277,7 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
   };
 
   // stakeholders handlers
-  const onAddStakeholder = (stakeholder: StakeholderInfo) => {
+  const onAddStakeholder = (stakeholder: AccountInfo) => {
     form.setFieldValue(CreateWebsiteFormFieldNames.SelectedStakeholders, selectedStakeholders.concat(stakeholder));
 
     setSelectedStakeholders([...selectedStakeholders, stakeholder]);
@@ -324,7 +296,7 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
       setFilteredOptionsForStakeholders(searchOptions);
     }
   };
-  const onRemoveStakeholder = (stakeholder: MemberInfo) => {
+  const onRemoveStakeholder = (stakeholder: AccountInfo) => {
     form.setFieldValue(
       CreateWebsiteFormFieldNames.SelectedStakeholders,
       selectedStakeholders.filter((m) => m.id !== stakeholder.id)
@@ -351,14 +323,14 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
       setFilteredOptionsForAdvisors(searchOptions);
     }
   };
-  const addAdvisor = (advisor: AdvisorInfo) => {
+  const addAdvisor = (advisor: AccountInfo) => {
     form.setFieldValue(CreateWebsiteFormFieldNames.SelectedAdvisors, selectedAdvisors.concat(advisor));
 
     setSelectedAdvisors([...selectedAdvisors, advisor]);
     // remove from filtered options
     setFilteredOptionsForAdvisors(filteredOptionsForAdvisors.filter((option) => option.id !== advisor.id));
   };
-  const removeAdvisor = (advisor: AdvisorInfo) => {
+  const onRemoveAdvisor = (advisor: AccountInfo) => {
     form.setFieldValue(
       CreateWebsiteFormFieldNames.SelectedAdvisors,
       selectedAdvisors.filter((m) => m.id !== advisor.id)
@@ -397,9 +369,9 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
       {/* Project info */}
       <Typography.Title level={3}>Senior Design Project | 2022-2023</Typography.Title>
       <Form initialValues={DummyFormData} form={form} layout="vertical" onFinish={onSubmitCreateWebsite}>
-        <Row gutter={[30, 15]} style={{ width: '100%' }}>
+        <Row gutter={screens.xs || !screens.xl ? [0, 0] : [30, 15]} style={{ width: '100%' }}>
           {/* name */}
-          <Col span={8}>
+          <Col xs={24} xl={8}>
             <Form.Item
               label="Project Name:"
               name={CreateWebsiteFormFieldNames.Name}
@@ -409,7 +381,7 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
             </Form.Item>
           </Col>
           {/* category */}
-          <Col span={8}>
+          <Col xs={24} xl={8}>
             <Form.Item
               label="Project Category:"
               name={CreateWebsiteFormFieldNames.Category}
@@ -423,7 +395,7 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
             </Form.Item>
           </Col>
           {/* logo */}
-          <Col span={8}>
+          <Col xs={24} xl={8}>
             <Form.Item
               label="Project Logo:"
               valuePropName="fileList"
@@ -462,12 +434,8 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
               <Checkbox>Do you have a video presentation for your project?</Checkbox>
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item
-              label=""
-              name={CreateWebsiteFormFieldNames.VideoUrl}
-              rules={[{ required: hasVideo, message: 'Please enter video url.' }]}
-            >
+          <Col xs={24} xl={12}>
+            <Form.Item label="" name={CreateWebsiteFormFieldNames.VideoUrl} rules={[{ required: hasVideo, message: 'Please enter video url.' }]}>
               <Input placeholder="Video Presentation URL" disabled={!hasVideo} />
             </Form.Item>
           </Col>
@@ -492,183 +460,67 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
         </Form.Item>
         <Divider style={{ color: 'black' }} />
         {/* Team members */}
-        <Typography.Title level={3}>Team Members</Typography.Title>
-        <br />
-        <Row>
-          <Col span={5}>
-            <Typography.Title level={4}>Search</Typography.Title>
-          </Col>
-          <Col span={18} offset={1}>
-            <Typography.Title level={4}>Added Members</Typography.Title>
-          </Col>
-        </Row>
-        <Row style={{ alignItems: 'baseline' }}>
-          <Col span={5}>
-            <SelectSearch
-              onFocus={onFocusSearchMembers}
-              onSearch={onSearchMember}
-              onSelect={onAddMember}
-              options={filteredOptionsForMembers}
-            />
-          </Col>
-          <Col span={18} offset={1}>
-            <Form.Item
-              name={CreateWebsiteFormFieldNames.SelectedMembers}
-              rules={[
-                {
-                  validator: (_, value) => {
-                    if (value.length > 0) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('Please select at least one team member.'));
-                  },
-                },
-              ]}
-            >
-              <List
-                size="small"
-                grid={{ gutter: 10, column: 3 }}
-                dataSource={selectedMembers}
-                locale={{ emptyText: 'No members added yet.' }}
-                renderItem={(member: MemberInfo) => (
-                  <List.Item key={member.id} style={{ border: '1px solid', padding: '5px' }}>
-                    <Space>
-                      <Button type="text" danger onClick={() => removeMember(member)}>
-                        <MinusSquareOutlined />
-                      </Button>
-                      <Typography.Text>{`${member.name} (${member.username})`}</Typography.Text>
-                    </Space>
-                  </List.Item>
-                )}
-              ></List>
-            </Form.Item>
-          </Col>
-        </Row>
+        <SearchAddAccount
+          title="Team Members"
+          subtitle="Added Members"
+          onSearch={onSearchMember}
+          filteredOptions={filteredOptionsForMembers}
+          selectedAccounts={selectedMembers}
+          onAdd={onAddMember}
+          onRemove={onRemoveMember}
+          onFocusSearch={onFocusSearchMembers}
+          formItemName={CreateWebsiteFormFieldNames.SelectedMembers}
+          formItemErrorMessage="Please select at least one team member."
+        />
 
         <Divider />
         {/* Stake Holders */}
-        <Typography.Title level={3}>Stakeholders</Typography.Title>
-        <br />
-        <Row>
-          <Col span={5}>
-            <Typography.Title level={4}>Search</Typography.Title>
-          </Col>
-          <Col span={18} offset={1}>
-            <Typography.Title level={4}>Added Stakeholders</Typography.Title>
-          </Col>
-        </Row>
-        <Row style={{ alignItems: 'baseline' }}>
-          <Col span={5}>
-            <SelectSearch
-              onFocus={onFocusSearchStakeholders}
-              onSearch={onSearchStakeholders}
-              onSelect={onAddStakeholder}
-              options={filteredOptionsForStakeholders}
-            />
-          </Col>
-          <Col span={18} offset={1}>
-            <Form.Item
-              name={CreateWebsiteFormFieldNames.SelectedStakeholders}
-              rules={[
-                {
-                  validator: (_, value) => {
-                    if (value.length > 0) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('Please select at least one stakeholder.'));
-                  },
-                },
-              ]}
-            >
-              <List
-                size="small"
-                grid={{ gutter: 10, column: 3 }}
-                dataSource={selectedStakeholders}
-                locale={{ emptyText: 'No stakeholders added yet.' }}
-                renderItem={(item: MemberInfo) => (
-                  <List.Item key={item.id} style={{ border: '1px solid', padding: '5px' }}>
-                    <Button type="text" danger onClick={() => onRemoveStakeholder(item)}>
-                      <MinusSquareOutlined />
-                    </Button>
-                    <Typography.Text>{`${item.name} (${item.username})`}</Typography.Text>
-                  </List.Item>
-                )}
-              ></List>
-            </Form.Item>
-          </Col>
-        </Row>
+        <SearchAddAccount
+          title="Stakeholders"
+          subtitle="Added Stakeholders"
+          onSearch={onSearchStakeholders}
+          filteredOptions={filteredOptionsForStakeholders}
+          selectedAccounts={selectedStakeholders}
+          onAdd={onAddStakeholder}
+          onRemove={onRemoveStakeholder}
+          onFocusSearch={onFocusSearchStakeholders}
+          formItemName={CreateWebsiteFormFieldNames.SelectedStakeholders}
+          formItemErrorMessage="Please select at least one stakeholder."
+        />
 
         <Divider />
         {/* Advisors */}
-        <Typography.Title level={3}>Advisors</Typography.Title>
-        <br />
-        <Row>
-          <Col span={5}>
-            <Typography.Title level={4}>Search</Typography.Title>
-          </Col>
-          <Col span={18} offset={1}>
-            <Typography.Title level={4}>Added Advisors</Typography.Title>
-          </Col>
-        </Row>
-        <Row style={{ alignItems: 'baseline' }}>
-          <Col span={5}>
-            <SelectSearch
-              onFocus={onFocusSearchAdvisors}
-              onSearch={onSearchAdvisor}
-              onSelect={addAdvisor}
-              options={filteredOptionsForAdvisors}
-            />
-          </Col>
-          <Col span={18} offset={1}>
-            <Form.Item
-              name={CreateWebsiteFormFieldNames.SelectedAdvisors}
-              rules={[
-                {
-                  validator: (_, value) => {
-                    if (value.length > 0) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('Please select at least one advisor.'));
-                  },
-                },
-              ]}
-            >
-              <List
-                size="small"
-                grid={{ gutter: 10, column: 3 }}
-                dataSource={selectedAdvisors}
-                locale={{ emptyText: 'No advisors added yet.' }}
-                renderItem={(item: AdvisorInfo) => (
-                  <List.Item key={item.id} style={{ border: '1px solid', padding: '5px' }}>
-                    <Space>
-                      <Button type="text" danger onClick={() => removeAdvisor(item)}>
-                        <MinusSquareOutlined />
-                      </Button>
-                      <Typography.Text>{`${item.name} (${item.username})`}</Typography.Text>
-                    </Space>
-                  </List.Item>
-                )}
-              ></List>
-            </Form.Item>
-          </Col>
-        </Row>
+        <SearchAddAccount
+          title="Advisors"
+          subtitle="Added Advisors"
+          onSearch={onSearchAdvisor}
+          filteredOptions={filteredOptionsForAdvisors}
+          selectedAccounts={selectedAdvisors}
+          onAdd={addAdvisor}
+          onRemove={onRemoveAdvisor}
+          onFocusSearch={onFocusSearchAdvisors}
+          formItemName={CreateWebsiteFormFieldNames.SelectedAdvisors}
+          formItemErrorMessage="Please select at least one advisor."
+        />
 
-        {/* submit button */}
+        {/* review & submit button */}
         <br />
-        <Row justify="center">
-          <Col style={{ textAlign: 'center' }}>
-            <Button style={{ width: '350px', height: '50px' }} onClick={previewWebsite}>
+        <Row justify="center" gutter={[20, 0]}>
+          <Col style={{ textAlign: 'center' }} xs={24} xl={6} lg={8} md={10}>
+            <Button style={{ width: '100%', height: '50px' }} onClick={previewWebsite}>
               Preview Project Website
             </Button>
-            <Typography.Paragraph style={{ padding: '5px 10px', width: '350px' }}>
-              Click to preview how your website looks.
-            </Typography.Paragraph>
+            <Typography.Paragraph style={{ padding: '5px 10px', width: '100%' }}>Click to preview how your website looks</Typography.Paragraph>
           </Col>
-          <Col offset={1} span={5} style={{ textAlign: 'center' }}>
-            <Button type="primary" style={{ width: '350px', height: '50px' }} htmlType="submit">
+          <Col style={{ textAlign: 'center' }} xs={24} xl={6} lg={8} md={10}>
+            <Button
+              type="primary"
+              style={{ width: '100%', height: '50px', backgroundColor: '#ffc600', color: '#232d38', border: '0px' }}
+              htmlType="submit"
+            >
               Submit Project Website
             </Button>
-            <Typography.Paragraph style={{ padding: '5px 10px', width: '350px' }}>
+            <Typography.Paragraph style={{ padding: '5px 10px', width: '100%' }}>
               Once clicked, the information you entered will be sent for review to be published on the website.
             </Typography.Paragraph>
           </Col>
