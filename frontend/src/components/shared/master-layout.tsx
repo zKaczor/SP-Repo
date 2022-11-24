@@ -8,7 +8,8 @@ import { NavigationRoutes } from '../../constants';
 import logo from '../../images/CollegeComputingInformaticsLogo.png';
 import BackgroundImage from '../../images/create-website-bg.jpg';
 import { useAuth } from '../../utils/auth-context';
-import { MenuDrawer } from './menu-drawer';
+import { DesktopMenu } from './desktop-menu';
+import { MenuDrawer } from './mobile-menu-drawer';
 const { useBreakpoint } = Grid;
 const { Header, Footer, Content } = Layout;
 
@@ -121,46 +122,46 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
               xl={{ span: 16, offset: 1 }}
             >
               {screens.xs || !screens.xl ? (
-                <>
-                  <MenuOutlined onClick={() => setIsDrawerOpen(true)} />
-                </>
+                <MenuOutlined onClick={() => setIsDrawerOpen(true)} />
               ) : (
-                <>
-                  <Menu
-                    style={{
-                      width: '100%',
-                      paddingTop: '0px',
-                      display: 'flex',
-                      justifyContent: 'end',
-                      overflowY: 'auto',
-                      overflowX: 'hidden',
-                    }}
-                    theme="dark"
-                    mode="horizontal"
-                    defaultSelectedKeys={[NavigationRoutes.Home.key]}
-                    onSelect={(item) => onSelectMenu(item.key)}
-                    selectedKeys={selectedMenu}
-                  >
-                    <Menu.Item key={NavigationRoutes.Home.key}>
-                      {NavigationRoutes.Home.title}
-                    </Menu.Item>
-                    <Menu.Item key={NavigationRoutes.About.key}>About</Menu.Item>
-                    <Menu.Item key={NavigationRoutes.Syllabus.key}>Syllabus</Menu.Item>
-                    {auth?.token && (
-                      <Menu.Item key={NavigationRoutes.WebCreation.key}>Web Creation</Menu.Item>
-                    )}
+                <DesktopMenu
+                  isAuthenticated={auth?.token ? true : false}
+                  onSelectMenu={onSelectMenu}
+                  selectedMenu={selectedMenu}
+                />
+                // <Menu
+                //   style={{
+                //     width: '100%',
+                //     paddingTop: '0px',
+                //     display: 'flex',
+                //     justifyContent: 'end',
+                //     overflowY: 'auto',
+                //     overflowX: 'hidden',
+                //   }}
+                //   theme="dark"
+                //   mode="horizontal"
+                //   defaultSelectedKeys={[NavigationRoutes.Home.key]}
+                //   onSelect={(item) => onSelectMenu(item.key)}
+                //   selectedKeys={selectedMenu}
+                // >
+                //   <Menu.Item key={NavigationRoutes.Home.key}>
+                //     {NavigationRoutes.Home.title}
+                //   </Menu.Item>
+                //   <Menu.Item key={NavigationRoutes.About.key}>About</Menu.Item>
+                //   <Menu.Item key={NavigationRoutes.Syllabus.key}>Syllabus</Menu.Item>
+                //   {auth?.token && (
+                //     <Menu.Item key={NavigationRoutes.WebCreation.key}>Web Creation</Menu.Item>
+                //   )}
+                //   <Menu.Item key={NavigationRoutes.Projects.key}>Projects</Menu.Item>
+                //   <Menu.Item key={NavigationRoutes.Judges.key}>Judges</Menu.Item>
+                //   <Menu.Item key={NavigationRoutes.Sponsors.key}>Sponsors</Menu.Item>
 
-                    <Menu.Item key={NavigationRoutes.Projects.key}>Projects</Menu.Item>
-                    <Menu.Item key={NavigationRoutes.Judges.key}>Judges</Menu.Item>
-                    <Menu.Item key={NavigationRoutes.Sponsors.key}>Sponsors</Menu.Item>
-
-                    {auth?.token ? (
-                      <Menu.Item key={NavigationRoutes.Logout.key}>Logout</Menu.Item>
-                    ) : (
-                      <Menu.Item key={NavigationRoutes.Login.key}>Login</Menu.Item>
-                    )}
-                  </Menu>
-                </>
+                //   {auth?.token ? (
+                //     <Menu.Item key={NavigationRoutes.Logout.key}>Logout</Menu.Item>
+                //   ) : (
+                //     <Menu.Item key={NavigationRoutes.Login.key}>Login</Menu.Item>
+                //   )}
+                // </Menu>
               )}
             </Col>
           </Row>
@@ -227,63 +228,6 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
         onSelectMenu={onSelectMenu}
         isAuthenticated={auth?.token ? true : false}
       />
-      {/* <Drawer title="Menu" placement="right" onClose={onCloseMenuDrawer} open={drawerOpen}>
-        {MenuItems.map((item) =>
-          item.key === NavigationRoutes.WebCreation.key && !auth?.token ? null : (
-            <Button
-              type="default"
-              key={item.key}
-              onClick={() => onSelectMenu({ key: item.key })}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                border: '0px',
-                borderBottom: '3px solid #d1d1d1',
-              }}
-            >
-              <Typography.Paragraph strong>{item.title}</Typography.Paragraph>
-            </Button>
-          )
-        )}
-        {auth?.token ? (
-          <Button
-            type="primary"
-            key={NavigationRoutes.Logout.key}
-            onClick={() => onSelectMenu({ key: NavigationRoutes.Logout.key })}
-            style={{
-              display: 'block',
-              width: '100%',
-
-              // textAlign: 'left',
-              border: '0px',
-              // borderBottom: '3px solid #d1d1d1',
-            }}
-          >
-            <Typography.Paragraph strong style={{ color: 'white' }}>
-              {NavigationRoutes.Logout.title}
-            </Typography.Paragraph>
-          </Button>
-        ) : (
-          <Button
-            type="primary"
-            key={NavigationRoutes.Login.key}
-            onClick={() => onSelectMenu({ key: NavigationRoutes.Login.key })}
-            style={{
-              display: 'block',
-              width: '100%',
-
-              // textAlign: 'left',
-              border: '0px',
-              // borderBottom: '3px solid #d1d1d1',
-            }}
-          >
-            <Typography.Paragraph strong style={{ color: 'white' }}>
-              {NavigationRoutes.Login.title}
-            </Typography.Paragraph>
-          </Button>
-        )}
-      </Drawer> */}
     </>
   );
 };
