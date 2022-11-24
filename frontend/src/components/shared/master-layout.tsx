@@ -1,13 +1,16 @@
 /** @format */
 
-import { Col, Image, Layout, Menu, Row, Typography } from 'antd';
-import { FC, useContext, useEffect, useState } from 'react';
-import { Outlet, useLocation, useMatch, useMatches, useNavigate } from 'react-router-dom';
+import { MenuOutlined } from '@ant-design/icons';
+import { Col, Grid, Image, Layout, Menu, Row, Typography } from 'antd';
+import { FC, useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { NavigationRoutes } from '../../constants';
 import logo from '../../images/CollegeComputingInformaticsLogo.png';
 import BackgroundImage from '../../images/create-website-bg.jpg';
 import { useAuth } from '../../utils/auth-context';
-
+import { DesktopMenu } from './desktop-menu';
+import { MenuDrawer } from './mobile-menu-drawer';
+const { useBreakpoint } = Grid;
 const { Header, Footer, Content } = Layout;
 
 interface MasterLayoutProps {}
@@ -17,8 +20,9 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
   const [subHeaderTitle, setSubHeaderTitle] = useState('');
   const navigate = useNavigate();
   const [selectedMenu, setSelectedMenu] = useState<string[] | undefined>();
-
   const auth = useAuth();
+  const screens = useBreakpoint();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Set the subheader title based on the current route (when page is refreshed)
   useEffect(() => {
@@ -52,7 +56,7 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
   }, [location]);
 
   const onSelectMenu = (e: any) => {
-    switch (e.key) {
+    switch (e) {
       case NavigationRoutes.Home.key:
         navigate(NavigationRoutes.Home.path);
         setSubHeaderTitle(NavigationRoutes.Home.title);
@@ -80,44 +84,87 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
       default:
         break;
     }
+    setIsDrawerOpen(false);
+  };
+
+  const onCloseMenuDrawer = () => {
+    setIsDrawerOpen(false);
   };
 
   return (
     <>
-      <Layout style={{ minHeight: '100vh', display: 'flex' }}>
-        <Header style={{ paddingTop: '10px', paddingBottom: '10px', height: 'fit-content' }}>
-          <a
-            target={'_blank'}
-            href="https://cci.drexel.edu/seniordesign/index.html"
-            rel="noreferrer"
-          >
-            <Image src={logo} width={400} preview={false} />
-          </a>
-          <Menu
-            style={{ width: '50%', paddingTop: '0px', display: 'flex', justifyContent: 'end' }}
-            theme="dark"
-            mode="horizontal"
-            defaultSelectedKeys={[NavigationRoutes.Home.key]}
-            onSelect={(item) => onSelectMenu(item)}
-            selectedKeys={selectedMenu}
-          >
-            <Menu.Item key={NavigationRoutes.Home.key}>{NavigationRoutes.Home.title}</Menu.Item>
-            <Menu.Item key={NavigationRoutes.About.key}>About</Menu.Item>
-            <Menu.Item key={NavigationRoutes.Syllabus.key}>Syllabus</Menu.Item>
-            {auth?.token && (
-              <Menu.Item key={NavigationRoutes.WebCreation.key}>Web Creation</Menu.Item>
-            )}
+      <Layout style={{ minHeight: '100vh', display: 'flex', minWidth: '375px', maxWidth: '100vw' }}>
+        <Header
+          style={{
+            paddingLeft: screens.xs || !screens.lg ? '10px' : '24px',
+            paddingRight: screens.xs || !screens.lg ? '10px' : '24px',
+            paddingTop: '10px',
+            paddingBottom: '10px',
+            height: 'fit-content',
+          }}
+        >
+          <Row>
+            <Col xs={15} sm={15} md={10} lg={9} xl={7}>
+              <a
+                target={'_blank'}
+                href="https://cci.drexel.edu/seniordesign/index.html"
+                rel="noreferrer"
+              >
+                <Image src={logo} preview={false} width="100%" />
+              </a>
+            </Col>
+            <Col
+              style={{ textAlign: 'end' }}
+              xs={{ span: 8, offset: 1 }}
+              sm={{ span: 8, offset: 1 }}
+              md={{ span: 13, offset: 1 }}
+              lg={{ span: 14, offset: 1 }}
+              xl={{ span: 16, offset: 1 }}
+            >
+              {screens.xs || !screens.xl ? (
+                <MenuOutlined onClick={() => setIsDrawerOpen(true)} />
+              ) : (
+                <DesktopMenu
+                  isAuthenticated={auth?.token ? true : false}
+                  onSelectMenu={onSelectMenu}
+                  selectedMenu={selectedMenu}
+                />
+                // <Menu
+                //   style={{
+                //     width: '100%',
+                //     paddingTop: '0px',
+                //     display: 'flex',
+                //     justifyContent: 'end',
+                //     overflowY: 'auto',
+                //     overflowX: 'hidden',
+                //   }}
+                //   theme="dark"
+                //   mode="horizontal"
+                //   defaultSelectedKeys={[NavigationRoutes.Home.key]}
+                //   onSelect={(item) => onSelectMenu(item.key)}
+                //   selectedKeys={selectedMenu}
+                // >
+                //   <Menu.Item key={NavigationRoutes.Home.key}>
+                //     {NavigationRoutes.Home.title}
+                //   </Menu.Item>
+                //   <Menu.Item key={NavigationRoutes.About.key}>About</Menu.Item>
+                //   <Menu.Item key={NavigationRoutes.Syllabus.key}>Syllabus</Menu.Item>
+                //   {auth?.token && (
+                //     <Menu.Item key={NavigationRoutes.WebCreation.key}>Web Creation</Menu.Item>
+                //   )}
+                //   <Menu.Item key={NavigationRoutes.Projects.key}>Projects</Menu.Item>
+                //   <Menu.Item key={NavigationRoutes.Judges.key}>Judges</Menu.Item>
+                //   <Menu.Item key={NavigationRoutes.Sponsors.key}>Sponsors</Menu.Item>
 
-            <Menu.Item key={NavigationRoutes.Projects.key}>Projects</Menu.Item>
-            <Menu.Item key={NavigationRoutes.Judges.key}>Judges</Menu.Item>
-            <Menu.Item key={NavigationRoutes.Sponsors.key}>Sponsors</Menu.Item>
-
-            {auth?.token ? (
-              <Menu.Item key={NavigationRoutes.Logout.key}>Logout</Menu.Item>
-            ) : (
-              <Menu.Item key={NavigationRoutes.Login.key}>Login</Menu.Item>
-            )}
-          </Menu>
+                //   {auth?.token ? (
+                //     <Menu.Item key={NavigationRoutes.Logout.key}>Logout</Menu.Item>
+                //   ) : (
+                //     <Menu.Item key={NavigationRoutes.Login.key}>Login</Menu.Item>
+                //   )}
+                // </Menu>
+              )}
+            </Col>
+          </Row>
         </Header>
         <Row style={{ height: '200px' }}>
           <Col
@@ -144,7 +191,12 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
           </Col>
         </Row>
         <Content
-          style={{ margin: '24px', backgroundColor: 'white', flex: '1', borderRadius: '10px' }}
+          style={{
+            margin: screens.xs || !screens.lg ? '10px' : '24px',
+            backgroundColor: 'white',
+            flex: '1',
+            borderRadius: '10px',
+          }}
         >
           <Outlet />
         </Content>
@@ -170,6 +222,12 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
           </Row>
         </Footer>
       </Layout>
+      <MenuDrawer
+        isOpen={isDrawerOpen}
+        onCloseMenuDrawer={onCloseMenuDrawer}
+        onSelectMenu={onSelectMenu}
+        isAuthenticated={auth?.token ? true : false}
+      />
     </>
   );
 };

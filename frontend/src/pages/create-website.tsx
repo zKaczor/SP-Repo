@@ -1,6 +1,5 @@
 import {
   Button,
-  Card,
   Checkbox,
   Col,
   Divider,
@@ -17,20 +16,11 @@ import {
   UploadFile,
 } from 'antd';
 import { FC, useEffect, useState } from 'react';
-import {
-  UploadOutlined,
-  PlusOutlined,
-  PlusSquareOutlined,
-  MinusSquareOutlined,
-} from '@ant-design/icons';
+import { UploadOutlined, PlusOutlined, PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
-import {
-  CreateWebsiteFormFieldNames,
-  MAX_SCREEN_SHOT_COUNT,
-  NavigationRoutes,
-  ProjectCategories,
-} from '../constants';
+import { CreateWebsiteFormFieldNames, MAX_SCREEN_SHOT_COUNT, NavigationRoutes, ProjectCategories } from '../constants';
 import { useNavigate } from 'react-router-dom';
+import { SelectSearch } from '../components/select-search';
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -72,7 +62,7 @@ export interface CreateWebsiteFormData {
   selectedAdvisors?: AdvisorInfo[];
 }
 
-const DummyStudentsData: MemberInfo[] = [
+const DummyAllStudentsData: MemberInfo[] = [
   {
     id: '1',
     name: 'John Brown',
@@ -105,7 +95,7 @@ const DummyStudentsData: MemberInfo[] = [
   },
 ];
 
-const DummyStakeholdersData = [
+const DummyAllStakeholdersData = [
   {
     id: '1',
     name: 'Stakeholder 1',
@@ -138,7 +128,7 @@ const DummyStakeholdersData = [
   },
 ];
 
-const DummyAdvisorsData = [
+const DummyAllAdvisorsData = [
   {
     id: '1',
     name: 'Advisor 1',
@@ -246,30 +236,22 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
   const [screenShots, setScreenShots] = useState<UploadFile[]>(DummyFormData.screenshots ?? []);
   // exclude items that are already selected
   const [filteredOptionsForMembers, setFilteredOptionsForMembers] = useState<MemberInfo[]>(
-    DummyStudentsData.filter((item) => {
+    DummyAllStudentsData.filter((item) => {
       return !DummyFormData.selectedMembers?.find((member) => member.id === item.id);
     })
   );
-  const [selectedMembers, setSelectedMembers] = useState<MemberInfo[]>(
-    DummyFormData.selectedMembers ?? []
-  );
+  const [selectedMembers, setSelectedMembers] = useState<MemberInfo[]>(DummyFormData.selectedMembers ?? []);
 
-  const [selectedStakeholders, setSelectedStakeholders] = useState<StakeholderInfo[]>(
-    DummyFormData.selectedStakeholders ?? []
-  );
-  const [filteredOptionsForStakeholders, setFilteredOptionsForStakeholders] = useState<
-    StakeholderInfo[]
-  >(
-    DummyStakeholdersData.filter((item) => {
+  const [selectedStakeholders, setSelectedStakeholders] = useState<StakeholderInfo[]>(DummyFormData.selectedStakeholders ?? []);
+  const [filteredOptionsForStakeholders, setFilteredOptionsForStakeholders] = useState<StakeholderInfo[]>(
+    DummyAllStakeholdersData.filter((item) => {
       return !DummyFormData.selectedStakeholders?.find((stakeholder) => stakeholder.id === item.id);
     })
   );
 
-  const [selectedAdvisors, setSelectedAdvisors] = useState<AdvisorInfo[]>(
-    DummyFormData.selectedAdvisors ?? []
-  );
+  const [selectedAdvisors, setSelectedAdvisors] = useState<AdvisorInfo[]>(DummyFormData.selectedAdvisors ?? []);
   const [filteredOptionsForAdvisors, setFilteredOptionsForAdvisors] = useState<AdvisorInfo[]>(
-    DummyAdvisorsData.filter((item) => {
+    DummyAllAdvisorsData.filter((item) => {
       return !DummyFormData.selectedAdvisors?.find((advisor) => advisor.id === item.id);
     })
   );
@@ -298,18 +280,13 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
   };
   const onSearchMember = (value: string) => {
     if (value) {
-      const filteredOptions = DummyStudentsData.filter(
-        (item) =>
-          item.name.toLowerCase().includes(value) || item.username.toLowerCase().includes(value)
+      const filteredOptions = DummyAllStudentsData.filter(
+        (item) => item.name.toLowerCase().includes(value) || item.username.toLowerCase().includes(value)
       );
-      const searchOptions = filteredOptions.filter(
-        (item) => selectedMembers.find((m) => m.id === item.id) === undefined
-      );
+      const searchOptions = filteredOptions.filter((item) => selectedMembers.find((m) => m.id === item.id) === undefined);
       setFilteredOptionsForMembers(searchOptions);
     } else {
-      const searchOptions = DummyStudentsData.filter(
-        (item) => selectedMembers.find((m) => m.id === item.id) === undefined
-      );
+      const searchOptions = DummyAllStudentsData.filter((item) => selectedMembers.find((m) => m.id === item.id) === undefined);
       setFilteredOptionsForMembers(searchOptions);
     }
   };
@@ -322,34 +299,28 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
     // add to filtered options
     setFilteredOptionsForMembers([...filteredOptionsForMembers, member]);
   };
+  const onFocusSearchMembers = () => {
+    const searchOptions = DummyAllStudentsData.filter((item) => selectedMembers.find((m) => m.id === item.id) === undefined);
+    setFilteredOptionsForMembers(searchOptions);
+  };
 
   // stakeholders handlers
   const onAddStakeholder = (stakeholder: StakeholderInfo) => {
-    form.setFieldValue(
-      CreateWebsiteFormFieldNames.SelectedStakeholders,
-      selectedStakeholders.concat(stakeholder)
-    );
+    form.setFieldValue(CreateWebsiteFormFieldNames.SelectedStakeholders, selectedStakeholders.concat(stakeholder));
 
     setSelectedStakeholders([...selectedStakeholders, stakeholder]);
     // remove from filtered options
-    setFilteredOptionsForStakeholders(
-      filteredOptionsForStakeholders.filter((option) => option.id !== stakeholder.id)
-    );
+    setFilteredOptionsForStakeholders(filteredOptionsForStakeholders.filter((option) => option.id !== stakeholder.id));
   };
   const onSearchStakeholders = (value: string) => {
     if (value) {
-      const filteredOptions = DummyStakeholdersData.filter(
-        (item) =>
-          item.name.toLowerCase().includes(value) || item.username.toLowerCase().includes(value)
+      const filteredOptions = DummyAllStakeholdersData.filter(
+        (item) => item.name.toLowerCase().includes(value) || item.username.toLowerCase().includes(value)
       );
-      const searchOptions = filteredOptions.filter(
-        (item) => selectedStakeholders.find((m) => m.id === item.id) === undefined
-      );
+      const searchOptions = filteredOptions.filter((item) => selectedStakeholders.find((m) => m.id === item.id) === undefined);
       setFilteredOptionsForStakeholders(searchOptions);
     } else {
-      const searchOptions = DummyStakeholdersData.filter(
-        (item) => selectedStakeholders.find((m) => m.id === item.id) === undefined
-      );
+      const searchOptions = DummyAllStakeholdersData.filter((item) => selectedStakeholders.find((m) => m.id === item.id) === undefined);
       setFilteredOptionsForStakeholders(searchOptions);
     }
   };
@@ -362,37 +333,30 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
     // add to filtered options
     setFilteredOptionsForStakeholders([...filteredOptionsForStakeholders, stakeholder]);
   };
+  const onFocusSearchStakeholders = () => {
+    const searchOptions = DummyAllStakeholdersData.filter((item) => selectedStakeholders.find((m) => m.id === item.id) === undefined);
+    setFilteredOptionsForStakeholders(searchOptions);
+  };
 
   // advisors handlers
   const onSearchAdvisor = (value: string) => {
     if (value) {
-      const filteredOptions = DummyAdvisorsData.filter(
-        (item) =>
-          item.name.toLowerCase().includes(value) || item.username.toLowerCase().includes(value)
+      const filteredOptions = DummyAllAdvisorsData.filter(
+        (item) => item.name.toLowerCase().includes(value) || item.username.toLowerCase().includes(value)
       );
-      const searchOptions = filteredOptions.filter(
-        (item) => selectedAdvisors.find((m) => m.id === item.id) === undefined
-      );
+      const searchOptions = filteredOptions.filter((item) => selectedAdvisors.find((m) => m.id === item.id) === undefined);
       setFilteredOptionsForAdvisors(searchOptions);
     } else {
-      const searchOptions = DummyAdvisorsData.filter(
-        (item) => selectedAdvisors.find((m) => m.id === item.id) === undefined
-      );
+      const searchOptions = DummyAllAdvisorsData.filter((item) => selectedAdvisors.find((m) => m.id === item.id) === undefined);
       setFilteredOptionsForAdvisors(searchOptions);
     }
   };
-
   const addAdvisor = (advisor: AdvisorInfo) => {
-    form.setFieldValue(
-      CreateWebsiteFormFieldNames.SelectedAdvisors,
-      selectedAdvisors.concat(advisor)
-    );
+    form.setFieldValue(CreateWebsiteFormFieldNames.SelectedAdvisors, selectedAdvisors.concat(advisor));
 
     setSelectedAdvisors([...selectedAdvisors, advisor]);
     // remove from filtered options
-    setFilteredOptionsForAdvisors(
-      filteredOptionsForAdvisors.filter((option) => option.id !== advisor.id)
-    );
+    setFilteredOptionsForAdvisors(filteredOptionsForAdvisors.filter((option) => option.id !== advisor.id));
   };
   const removeAdvisor = (advisor: AdvisorInfo) => {
     form.setFieldValue(
@@ -402,6 +366,10 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
     setSelectedAdvisors(selectedAdvisors.filter((item) => item.id !== advisor.id));
     // add to filtered options
     setFilteredOptionsForAdvisors([...filteredOptionsForAdvisors, advisor]);
+  };
+  const onFocusSearchAdvisors = () => {
+    const searchOptions = DummyAllAdvisorsData.filter((item) => selectedAdvisors.find((m) => m.id === item.id) === undefined);
+    setFilteredOptionsForAdvisors(searchOptions);
   };
 
   const onSubmitCreateWebsite = (values: any) => {
@@ -428,12 +396,7 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
     <>
       {/* Project info */}
       <Typography.Title level={3}>Senior Design Project | 2022-2023</Typography.Title>
-      <Form
-        initialValues={DummyFormData}
-        form={form}
-        layout="vertical"
-        onFinish={onSubmitCreateWebsite}
-      >
+      <Form initialValues={DummyFormData} form={form} layout="vertical" onFinish={onSubmitCreateWebsite}>
         <Row gutter={[30, 15]} style={{ width: '100%' }}>
           {/* name */}
           <Col span={8}>
@@ -517,11 +480,7 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
           style={{ textAlignLast: 'center' }}
         >
           <ImgCrop rotate onModalOk={onImgCropOk}>
-            <Upload
-              listType="picture-card"
-              accept=".png,.jpg"
-              fileList={form.getFieldValue(CreateWebsiteFormFieldNames.Screenshots)}
-            >
+            <Upload listType="picture-card" accept=".png,.jpg" fileList={form.getFieldValue(CreateWebsiteFormFieldNames.Screenshots)}>
               {screenShots.length < MAX_SCREEN_SHOT_COUNT && (
                 <div>
                   <PlusOutlined />
@@ -539,40 +498,20 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
           <Col span={5}>
             <Typography.Title level={4}>Search</Typography.Title>
           </Col>
-          <Col flex="auto">
+          <Col span={18} offset={1}>
             <Typography.Title level={4}>Added Members</Typography.Title>
           </Col>
         </Row>
         <Row style={{ alignItems: 'baseline' }}>
           <Col span={5}>
-            <Select
-              style={{ width: '300px' }}
-              mode="multiple"
-              placeholder="Search for team members..."
-              onSearch={(value) => onSearchMember(value)}
-              dropdownRender={() => (
-                <>
-                  {filteredOptionsForMembers.length === 0 ? (
-                    <Empty description={<>No more data</>} image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                  ) : (
-                    filteredOptionsForMembers.map((member) => (
-                      <Row style={{ alignItems: 'baseline' }} key={member.id}>
-                        <Col flex="auto" style={{ padding: '0 15px' }}>
-                          <Typography.Text>{`${member.name} (${member.username})`}</Typography.Text>
-                        </Col>
-                        <Col flex="50px">
-                          <Button type="text" onClick={() => onAddMember(member)}>
-                            <PlusSquareOutlined />
-                          </Button>
-                        </Col>
-                      </Row>
-                    ))
-                  )}
-                </>
-              )}
-            ></Select>
+            <SelectSearch
+              onFocus={onFocusSearchMembers}
+              onSearch={onSearchMember}
+              onSelect={onAddMember}
+              options={filteredOptionsForMembers}
+            />
           </Col>
-          <Col span={19}>
+          <Col span={18} offset={1}>
             <Form.Item
               name={CreateWebsiteFormFieldNames.SelectedMembers}
               rules={[
@@ -614,40 +553,20 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
           <Col span={5}>
             <Typography.Title level={4}>Search</Typography.Title>
           </Col>
-          <Col flex="auto">
+          <Col span={18} offset={1}>
             <Typography.Title level={4}>Added Stakeholders</Typography.Title>
           </Col>
         </Row>
         <Row style={{ alignItems: 'baseline' }}>
           <Col span={5}>
-            <Select
-              style={{ width: '300px' }}
-              mode="multiple"
-              placeholder="Search for stakeholders..."
-              onSearch={(value) => onSearchStakeholders(value)}
-              dropdownRender={() => (
-                <>
-                  {filteredOptionsForStakeholders.length === 0 ? (
-                    <Empty description={<>No more data</>} image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                  ) : (
-                    filteredOptionsForStakeholders.map((item) => (
-                      <Row style={{ alignItems: 'baseline' }} key={item.id}>
-                        <Col flex="auto" style={{ padding: '0 15px' }}>
-                          <Typography.Text>{`${item.name} (${item.username})`}</Typography.Text>
-                        </Col>
-                        <Col flex="50px">
-                          <Button type="text" onClick={() => onAddStakeholder(item)}>
-                            <PlusSquareOutlined />
-                          </Button>
-                        </Col>
-                      </Row>
-                    ))
-                  )}
-                </>
-              )}
-            ></Select>
+            <SelectSearch
+              onFocus={onFocusSearchStakeholders}
+              onSearch={onSearchStakeholders}
+              onSelect={onAddStakeholder}
+              options={filteredOptionsForStakeholders}
+            />
           </Col>
-          <Col span={19}>
+          <Col span={18} offset={1}>
             <Form.Item
               name={CreateWebsiteFormFieldNames.SelectedStakeholders}
               rules={[
@@ -687,40 +606,20 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
           <Col span={5}>
             <Typography.Title level={4}>Search</Typography.Title>
           </Col>
-          <Col flex="auto">
+          <Col span={18} offset={1}>
             <Typography.Title level={4}>Added Advisors</Typography.Title>
           </Col>
         </Row>
         <Row style={{ alignItems: 'baseline' }}>
           <Col span={5}>
-            <Select
-              style={{ width: '300px' }}
-              mode="multiple"
-              placeholder="Search for advisors..."
-              onSearch={(value) => onSearchAdvisor(value)}
-              dropdownRender={() => (
-                <>
-                  {filteredOptionsForAdvisors.length === 0 ? (
-                    <Empty description={<>No more data</>} image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                  ) : (
-                    filteredOptionsForAdvisors.map((item) => (
-                      <Row style={{ alignItems: 'baseline' }} key={item.id}>
-                        <Col flex="auto" style={{ padding: '0 15px' }}>
-                          <Typography.Text>{`${item.name} (${item.username})`}</Typography.Text>
-                        </Col>
-                        <Col flex="50px">
-                          <Button type="text" onClick={() => addAdvisor(item)}>
-                            <PlusSquareOutlined />
-                          </Button>
-                        </Col>
-                      </Row>
-                    ))
-                  )}
-                </>
-              )}
-            ></Select>
+            <SelectSearch
+              onFocus={onFocusSearchAdvisors}
+              onSearch={onSearchAdvisor}
+              onSelect={addAdvisor}
+              options={filteredOptionsForAdvisors}
+            />
           </Col>
-          <Col span={19}>
+          <Col span={18} offset={1}>
             <Form.Item
               name={CreateWebsiteFormFieldNames.SelectedAdvisors}
               rules={[
@@ -770,8 +669,7 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
               Submit Project Website
             </Button>
             <Typography.Paragraph style={{ padding: '5px 10px', width: '350px' }}>
-              Once clicked, the information you entered will be sent for review to be published on
-              the website.
+              Once clicked, the information you entered will be sent for review to be published on the website.
             </Typography.Paragraph>
           </Col>
         </Row>
