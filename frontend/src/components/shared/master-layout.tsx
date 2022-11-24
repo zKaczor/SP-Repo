@@ -1,13 +1,14 @@
 /** @format */
 
 import { MenuOutlined } from '@ant-design/icons';
-import { Col, Drawer, Grid, Image, Layout, Menu, Row, Typography } from 'antd';
+import { Col, Grid, Image, Layout, Menu, Row, Typography } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { MenuItems, NavigationRoutes } from '../../constants';
+import { NavigationRoutes } from '../../constants';
 import logo from '../../images/CollegeComputingInformaticsLogo.png';
 import BackgroundImage from '../../images/create-website-bg.jpg';
 import { useAuth } from '../../utils/auth-context';
+import { MenuDrawer } from './menu-drawer';
 const { useBreakpoint } = Grid;
 const { Header, Footer, Content } = Layout;
 
@@ -20,7 +21,7 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
   const [selectedMenu, setSelectedMenu] = useState<string[] | undefined>();
   const auth = useAuth();
   const screens = useBreakpoint();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Set the subheader title based on the current route (when page is refreshed)
   useEffect(() => {
@@ -54,7 +55,7 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
   }, [location]);
 
   const onSelectMenu = (e: any) => {
-    switch (e.key) {
+    switch (e) {
       case NavigationRoutes.Home.key:
         navigate(NavigationRoutes.Home.path);
         setSubHeaderTitle(NavigationRoutes.Home.title);
@@ -82,11 +83,11 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
       default:
         break;
     }
-    setDrawerOpen(false);
+    setIsDrawerOpen(false);
   };
 
   const onCloseMenuDrawer = () => {
-    setDrawerOpen(false);
+    setIsDrawerOpen(false);
   };
 
   return (
@@ -103,7 +104,11 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
         >
           <Row>
             <Col xs={15} sm={15} md={10} lg={9} xl={7}>
-              <a target={'_blank'} href="https://cci.drexel.edu/seniordesign/index.html" rel="noreferrer">
+              <a
+                target={'_blank'}
+                href="https://cci.drexel.edu/seniordesign/index.html"
+                rel="noreferrer"
+              >
                 <Image src={logo} preview={false} width="100%" />
               </a>
             </Col>
@@ -117,7 +122,7 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
             >
               {screens.xs || !screens.xl ? (
                 <>
-                  <MenuOutlined onClick={() => setDrawerOpen(true)} />
+                  <MenuOutlined onClick={() => setIsDrawerOpen(true)} />
                 </>
               ) : (
                 <>
@@ -133,13 +138,17 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
                     theme="dark"
                     mode="horizontal"
                     defaultSelectedKeys={[NavigationRoutes.Home.key]}
-                    onSelect={(item) => onSelectMenu(item)}
+                    onSelect={(item) => onSelectMenu(item.key)}
                     selectedKeys={selectedMenu}
                   >
-                    <Menu.Item key={NavigationRoutes.Home.key}>{NavigationRoutes.Home.title}</Menu.Item>
+                    <Menu.Item key={NavigationRoutes.Home.key}>
+                      {NavigationRoutes.Home.title}
+                    </Menu.Item>
                     <Menu.Item key={NavigationRoutes.About.key}>About</Menu.Item>
                     <Menu.Item key={NavigationRoutes.Syllabus.key}>Syllabus</Menu.Item>
-                    {auth?.token && <Menu.Item key={NavigationRoutes.WebCreation.key}>Web Creation</Menu.Item>}
+                    {auth?.token && (
+                      <Menu.Item key={NavigationRoutes.WebCreation.key}>Web Creation</Menu.Item>
+                    )}
 
                     <Menu.Item key={NavigationRoutes.Projects.key}>Projects</Menu.Item>
                     <Menu.Item key={NavigationRoutes.Judges.key}>Judges</Menu.Item>
@@ -180,7 +189,14 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
             </Typography.Title>
           </Col>
         </Row>
-        <Content style={{ margin: screens.xs || !screens.lg ? '10px' : '24px', backgroundColor: 'white', flex: '1', borderRadius: '10px' }}>
+        <Content
+          style={{
+            margin: screens.xs || !screens.lg ? '10px' : '24px',
+            backgroundColor: 'white',
+            flex: '1',
+            borderRadius: '10px',
+          }}
+        >
           <Outlet />
         </Content>
         <Footer style={{ padding: '0px', display: 'flex', flexDirection: 'column' }}>
@@ -198,31 +214,76 @@ export const MasterLayout: FC<MasterLayoutProps> = (props) => {
           </Row>
           <Row style={{ backgroundColor: '#1A252F', width: '100%' }}>
             <Col span={24} style={{ textAlign: 'center', padding: '1rem 0px 0px' }}>
-              <Typography.Paragraph style={{ color: 'white' }}>© 2022 Drexel University. All Rights Reserved.</Typography.Paragraph>
+              <Typography.Paragraph style={{ color: 'white' }}>
+                © 2022 Drexel University. All Rights Reserved.
+              </Typography.Paragraph>
             </Col>
           </Row>
         </Footer>
       </Layout>
-      <Drawer title="Menu" placement="right" onClose={onCloseMenuDrawer} open={drawerOpen}>
+      <MenuDrawer
+        isOpen={isDrawerOpen}
+        onCloseMenuDrawer={onCloseMenuDrawer}
+        onSelectMenu={onSelectMenu}
+        isAuthenticated={auth?.token ? true : false}
+      />
+      {/* <Drawer title="Menu" placement="right" onClose={onCloseMenuDrawer} open={drawerOpen}>
         {MenuItems.map((item) =>
           item.key === NavigationRoutes.WebCreation.key && !auth?.token ? null : (
-            <>
-              <Typography.Paragraph key={item.key} onClick={() => onSelectMenu({ key: item.key })}>
-                {item.title}
-              </Typography.Paragraph>
-            </>
+            <Button
+              type="default"
+              key={item.key}
+              onClick={() => onSelectMenu({ key: item.key })}
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                border: '0px',
+                borderBottom: '3px solid #d1d1d1',
+              }}
+            >
+              <Typography.Paragraph strong>{item.title}</Typography.Paragraph>
+            </Button>
           )
         )}
         {auth?.token ? (
-          <Typography.Paragraph onClick={() => onSelectMenu({ key: NavigationRoutes.Logout.key })}>
-            {NavigationRoutes.Logout.title}
-          </Typography.Paragraph>
+          <Button
+            type="primary"
+            key={NavigationRoutes.Logout.key}
+            onClick={() => onSelectMenu({ key: NavigationRoutes.Logout.key })}
+            style={{
+              display: 'block',
+              width: '100%',
+
+              // textAlign: 'left',
+              border: '0px',
+              // borderBottom: '3px solid #d1d1d1',
+            }}
+          >
+            <Typography.Paragraph strong style={{ color: 'white' }}>
+              {NavigationRoutes.Logout.title}
+            </Typography.Paragraph>
+          </Button>
         ) : (
-          <Typography.Paragraph onClick={() => onSelectMenu({ key: NavigationRoutes.Login.key })}>
-            {NavigationRoutes.Login.title}
-          </Typography.Paragraph>
+          <Button
+            type="primary"
+            key={NavigationRoutes.Login.key}
+            onClick={() => onSelectMenu({ key: NavigationRoutes.Login.key })}
+            style={{
+              display: 'block',
+              width: '100%',
+
+              // textAlign: 'left',
+              border: '0px',
+              // borderBottom: '3px solid #d1d1d1',
+            }}
+          >
+            <Typography.Paragraph strong style={{ color: 'white' }}>
+              {NavigationRoutes.Login.title}
+            </Typography.Paragraph>
+          </Button>
         )}
-      </Drawer>
+      </Drawer> */}
     </>
   );
 };

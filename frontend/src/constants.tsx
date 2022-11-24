@@ -8,7 +8,7 @@ export const MenuItems = [
   { key: 'Sponsors', title: 'Sponsors' },
 ];
 
-type NavigationRouteType = {
+export type NavigationRouteType = {
   title: string;
   key: string;
   path: string;
