@@ -1,8 +1,8 @@
 import { MinusSquareOutlined } from '@ant-design/icons';
-import { Button, Col, Form, List, Row, Space, Typography } from 'antd';
+import { Button, Col, Form, List, Row, Space, Typography, Grid } from 'antd';
 import { FC } from 'react';
 import { SearchBar } from './search-bar';
-
+const { useBreakpoint } = Grid;
 export interface AccountInfo {
   id: string;
   name: string;
@@ -23,23 +23,18 @@ interface SearchAddAccountProps {
 }
 
 export const SearchAddAccount: FC<SearchAddAccountProps> = (props) => {
+  const screens = useBreakpoint();
   return (
     <>
       <Typography.Title level={3}>{props.title}</Typography.Title>
       <br />
-      <Row>
-        <Col span={5}>
+      <Row style={{ alignItems: 'baseline' }} gutter={[16, 16]}>
+        <Col xl={{ span: 7 }} lg={{ span: 7 }} xs={{ span: 24 }}>
           <Typography.Title level={4}>Search</Typography.Title>
-        </Col>
-        <Col xl={{ span: 18, offset: 1 }} lg={{ span: 18, offset: 1 }} xs={{ span: 24 }}>
-          <Typography.Title level={4}>{props.subtitle}</Typography.Title>
-        </Col>
-      </Row>
-      <Row style={{ alignItems: 'baseline' }}>
-        <Col span={5}>
           <SearchBar onFocus={props.onFocusSearch} onSearch={props.onSearch} onSelect={props.onAdd} options={props.filteredOptions} />
         </Col>
-        <Col xl={{ span: 18, offset: 1 }} lg={{ span: 18, offset: 1 }} xs={{ span: 24 }}>
+        <Col xl={{ span: 17 }} lg={{ span: 17 }} xs={{ span: 24 }}>
+          <Typography.Title level={4}>{props.subtitle}</Typography.Title>
           <Form.Item
             name={props.formItemName}
             rules={[
@@ -55,7 +50,7 @@ export const SearchAddAccount: FC<SearchAddAccountProps> = (props) => {
           >
             <List
               size="small"
-              grid={{ gutter: 10, column: 3 }}
+              grid={{ gutter: 10, column: screens.xs || !screens.lg ? 1 : 3 }}
               dataSource={props.selectedAccounts}
               locale={{ emptyText: 'No members added yet.' }}
               renderItem={(member: AccountInfo) => (

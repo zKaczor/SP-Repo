@@ -479,7 +479,7 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
           title="Stakeholders"
           subtitle="Added Stakeholders"
           onSearch={onSearchStakeholders}
-          filteredOptions={filteredOptionsForMembers}
+          filteredOptions={filteredOptionsForStakeholders}
           selectedAccounts={selectedStakeholders}
           onAdd={onAddStakeholder}
           onRemove={onRemoveStakeholder}
@@ -505,18 +505,18 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
 
         {/* review & submit button */}
         <br />
-        <Row justify="center">
-          <Col style={{ textAlign: 'center' }}>
-            <Button style={{ width: '350px', height: '50px' }} onClick={previewWebsite}>
+        <Row justify="center" gutter={[20, 0]}>
+          <Col style={{ textAlign: 'center' }} xs={24} xl={5} lg={8} md={10}>
+            <Button style={{ width: '100%', height: '50px' }} onClick={previewWebsite}>
               Preview Project Website
             </Button>
-            <Typography.Paragraph style={{ padding: '5px 10px', width: '350px' }}>Click to preview how your website looks.</Typography.Paragraph>
+            <Typography.Paragraph style={{ padding: '5px 10px', width: '100%' }}>Click to preview how your website looks</Typography.Paragraph>
           </Col>
-          <Col offset={1} span={5} style={{ textAlign: 'center' }}>
-            <Button type="primary" style={{ width: '350px', height: '50px' }} htmlType="submit">
+          <Col style={{ textAlign: 'center' }} xs={24} xl={5} lg={8} md={10}>
+            <Button type="primary" style={{ width: '100%', height: '50px' }} htmlType="submit">
               Submit Project Website
             </Button>
-            <Typography.Paragraph style={{ padding: '5px 10px', width: '350px' }}>
+            <Typography.Paragraph style={{ padding: '5px 10px', width: '100%' }}>
               Once clicked, the information you entered will be sent for review to be published on the website.
             </Typography.Paragraph>
           </Col>
