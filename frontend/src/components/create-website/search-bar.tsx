@@ -7,13 +7,13 @@ interface AccountInfo {
   name: string;
   username: string;
 }
-interface SelectSearchProps {
+interface SearchBarProps {
   onFocus: () => void;
   onSearch: (value: string) => void;
   onSelect: (item: AccountInfo) => void;
   options: AccountInfo[];
 }
-export const SelectSearch: FC<SelectSearchProps> = (props) => {
+export const SearchBar: FC<SearchBarProps> = (props) => {
   return (
     <Select
       onFocus={props.onFocus}
