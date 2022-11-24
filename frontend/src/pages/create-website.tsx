@@ -506,14 +506,18 @@ export const CreateWebsite: FC<CreateWebsiteProps> = (props) => {
         {/* review & submit button */}
         <br />
         <Row justify="center" gutter={[20, 0]}>
-          <Col style={{ textAlign: 'center' }} xs={24} xl={5} lg={8} md={10}>
+          <Col style={{ textAlign: 'center' }} xs={24} xl={6} lg={8} md={10}>
             <Button style={{ width: '100%', height: '50px' }} onClick={previewWebsite}>
               Preview Project Website
             </Button>
             <Typography.Paragraph style={{ padding: '5px 10px', width: '100%' }}>Click to preview how your website looks</Typography.Paragraph>
           </Col>
-          <Col style={{ textAlign: 'center' }} xs={24} xl={5} lg={8} md={10}>
-            <Button type="primary" style={{ width: '100%', height: '50px' }} htmlType="submit">
+          <Col style={{ textAlign: 'center' }} xs={24} xl={6} lg={8} md={10}>
+            <Button
+              type="primary"
+              style={{ width: '100%', height: '50px', backgroundColor: '#ffc600', color: '#232d38', border: '0px' }}
+              htmlType="submit"
+            >
               Submit Project Website
             </Button>
             <Typography.Paragraph style={{ padding: '5px 10px', width: '100%' }}>
